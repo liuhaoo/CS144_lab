@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <string>
+#include "buffer.hh"
 
 //! \brief An in-order byte stream.
 
@@ -18,9 +19,10 @@ class ByteStream {
     // that's a sign that you probably want to keep exploring
     // different approaches.
 
-    bool _error{};  //!< Flag indicating that the stream suffered an error.
+    bool _error = false;  //!< Flag indicating that the stream suffered an error.
     size_t _capacity;
-    std::deque<char> _buffer;
+    //std::deque<char> _buffer;
+    BufferList _buffer;
     bool end_write;
     size_t written_bytes;
     size_t read_bytes;
