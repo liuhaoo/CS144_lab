@@ -101,3 +101,5 @@ long StreamReassembler::merge_seg(seg_node &a, const seg_node &b){
 size_t StreamReassembler::unassembled_bytes() const { return _unassembled_bytes; }
 
 bool StreamReassembler::empty() const { return _unassembled_bytes == 0; }
+
+size_t StreamReassembler::ack_num() const { return _head_idx; }
