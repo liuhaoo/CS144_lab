@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <queue>
+#include <map>
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -39,6 +40,38 @@ class NetworkInterface {
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
+
+    static constexpr size_t MAX_MAPPING_TIME = 30000;
+    static constexpr size_t MAX_RETX_WAITING_TIME = 5000; 
+    struct arp_item{
+      EthernetAddress eth;
+      size_t time_of_create;
+    };
+    // mapping table
+    std::map<uint32_t,arp_item> _table{};
+    size_t timer = 0;
+    // the datagrams waitting for arp reply
+    struct waitting_payload{
+      size_t time_of_last_arp = 0;
+      std::queue<InternetDatagram> waitting_datagrams{};
+    };
+    std::map<uint32_t,waitting_payload> _waitting_list{};
+
+    std::optional<EthernetAddress> get_EthernetAdress(const uint32_t ip_address);
+
+    void send_helper(const EthernetAddress &MAC, const InternetDatagram &dgram);
+
+    std::optional<waitting_payload> get_WaittingList(const uint32_t &ip_address);
+
+    void send_ARP_request(const uint32_t &ip_address);
+
+    void send_ARP_reply(const uint32_t &ip_address, const EthernetAddress &eth);
+
+    void insert_mapping(const uint32_t &ip_address, const EthernetAddress &eth);
+
+    void send_waitting_list(const uint32_t &ip_address, const EthernetAddress &eth);
+
+    void ack_wait(const uint32_t &ip_address, const InternetDatagram &dgram);
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses
